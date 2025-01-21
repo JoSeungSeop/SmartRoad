@@ -1,3 +1,7 @@
+//안드로이드 서버 통신 테스트
+
+
+
 package com.example.server_chat_01;
 
 
