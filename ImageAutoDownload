@@ -1,0 +1,160 @@
+from selenium import webdriver
+#셀레니움을을 통해서 webdriver 호출해서 사용
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+#로딩 완료했는지 인식하려는 용도
+
+from bs4 import BeautifulSoup as bs
+#html 불러오는 라이브러리 -> bs 호출해서 사용
+import urllib.request
+#url에서 여러가지 작업할 때 사용하는 라이브러리
+
+import os
+from time import sleep
+
+
+
+
+# Selenium ChromeDriver 실행
+driver = webdriver.Chrome('./chromedriver/chromedriver')
+#드라이버 실행
+
+driver.implicitly_wait(3)
+#드라이버 대기 시간 세팅(3초 대기)
+
+
+
+
+wonkwang_band_url = 'https://band.us/band/63528563'
+# URL 접속
+
+driver.get(wonkwang_band_url)
+# 밴드 사이트로 접속
+
+
+
+
+# chromedriver html 반환 함수
+def get_html(driver):
+    
+    html = driver.page_source
+    # 변수에 html 소스 담음
+    
+    soup = bs(html, 'html.parser')
+    # bs html.parser 규격에 맞게 정리해줌(파싱할 때 편리)
+    
+    return soup
+
+
+
+
+# 이미지 저장 함수
+def get_img(img_url_list, foldername, filename):
+    
+    print("---get_img : {}---".format(filename))
+    
+    for img_num in range(0, len(img_url_list)):
+        url = img_url_list[img_num]
+        img_name = foldername+"/"+filename+"/"+filename+"({}).jpg".format(img_num+1)
+        
+#       만약 같은 이름의 이미지가 이미 있는 경우 저장 안함
+        if os.path.exists(img_name):
+            continue
+        else:
+#           없으면 이미지 저장함
+            urllib.request.urlretrieve(url, img_name)
+
+
+
+
+board_list = driver.find_elements_by_css_selector('div.postText._postText')
+# 보드 리스트(게시물 객체들을 리스트로 파싱해옴)
+
+soup = get_html(driver)
+# 현재 페이지의 html주소를 가져와서
+emo_raws = soup.select('a._emoteMainBtn')
+# 게시물들의 표정상태들을 파싱함
+
+todo_list = []
+# 배열 : 표정이 안 입력되어있는 게시물들 인덱스 수집용
+
+
+# 만약 표정을 안 입력한 상태(표정짓기)인 경우 배열에 '표정 짓기' 상태인 게시물 인덱스를 추가함
+for idx in range(0,len(emo_raws)):
+    emo_text = emo_raws[idx].text.strip()
+    if emo_text == '표정짓기':
+        todo_list.append(idx)
+
+
+
+
+# 본격적인 이미지와 텍스트 크롤링
+for idx in todo_list:
+    board_list[idx].click()
+#   표정짓기 상태인 게시물만 클릭(게시물 오픈)
+    
+#   로딩 완료 체크
+    try:
+        element_text = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.txtBody"))
+        )
+        
+        element_img = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "section.cPostCard._postCard.-postCountLayerOn"))
+        )
+    finally:
+        soup = get_html(driver)
+    
+#   memo.txt
+    memo_raw = str(soup.select_one('div.txtBody'))
+    memo = memo_raw.replace('<div class="txtBody">', '').replace('</div>', '').replace('<br/>','\n').strip()
+     
+#   텍스트 크롤링 및 파싱
+    textfield_raw = soup.select_one('div.txtBody').text
+    textfield = textfield_raw.replace(':','.').split('.')
+ 
+#   텍스트 파싱
+    sitename_idx = 2
+    date_idx = 4
+    work_idx = 6
+    member_idx = 8
+
+#   파싱한 텍스트 변수화
+    sitename = textfield[sitename_idx][:-1].strip()
+    date = textfield[date_idx][:-1].strip()
+    work = textfield[work_idx][:-1].strip()
+    member = textfield[member_idx][:-1].strip()
+
+#   filename 생성
+    filename = date+"_"+sitename+"_"+work+"_"+member
+    
+#   이미지 URL 크롤링
+    img_section = soup.select_one('section.cPostCard._postCard.-postCountLayerOn')
+    img_tag_list = img_section.select('li.collageItem > a > img')
+    img_url_list = []
+    for img_tag in img_tag_list:
+        img_url_list.append(img_tag.get('src'))
+        
+#   폴더 경로 정의
+    foldername_1depth = sitename
+    foldername_2depth = foldername_1depth +"/"+filename
+    
+#   만약 폴더가 없을 경우 폴더 생성
+    if not os.path.exists(foldername_1depth):
+        os.mkdir(foldername_1depth)
+    if not os.path.exists(foldername_2depth):
+        os.mkdir(foldername_2depth)
+
+#   txt파일로 텍스트 내용 저장
+    f = open(foldername_2depth+"/"+filename+".txt", 'w')
+    f.write(memo)
+    f.close()
+    
+#   이미지 저장
+    get_img(img_url_list, foldername_1depth, filename)
+    
+#   게시물 닫음
+    close_btn = driver.find_element_by_css_selector('button.btnCloseLyPost._btnClose')
+    close_btn.click()
