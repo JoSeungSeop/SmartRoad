@@ -30,29 +30,6 @@ var server = net.createServer(function(socket){                     // 콜백함
     else if(socket.remoteAddress.toString().substring(7) == "192.168.0.77") hh_socket = socket;
 
     socket.setEncoding("utf8");                                     // 데이터 UTF-8로 인코딩
-
-    socket.write("1*N");
-        
-        setTimeout(function(){
-                socket.write("1*E");
-                console.log("hihi");
-                
-                setTimeout(function(){
-                    socket.write("1*N");
-                    console.log("hihi");
-                    
-                    setTimeout(function(){
-                        socket.write("1*E");
-                        console.log("hihi");
-                        
-                        setTimeout(function(){
-                            socket.write("1*N");
-                            console.log("hihi");
-                            
-                        },5000);
-                    },5000);
-                },5000);
-        },5000);
         
     socket.on('data', function(data){                               // on('data') : 'data' 이벤트가 왔을 때 콜백함수 실행
         
