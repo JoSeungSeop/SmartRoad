@@ -1,3 +1,5 @@
+//신호 제어 요청을 받음
+
 var net = require('net');       // 소켓 서버를 위한 모듈
 var mysql = require("mysql");   // MariaDB와 연동을 위한 모듈
 var mh_socket, dj_socket1, dj_socket2, dj_socket3, hh_socket;
