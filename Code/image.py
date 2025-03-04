@@ -1,3 +1,5 @@
+#웹에 시각화한 이미지를 전송함
+
 # -*- coding: utf-8 -*- 
 import SocketServer #소켓서버 모듈
 import sys #입출력 모듈
