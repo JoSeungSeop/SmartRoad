@@ -1,3 +1,5 @@
+#미세먼지 데이터를 받아와 시각화
+
 #-*- coding:utf-8 -*-
 import schedule #일정시간마다 실행할 수 있게 해주는 모듈
 import time	#시간에 관한 함수를 쓰는 모듈
