@@ -1,3 +1,5 @@
+#미아 경로 분석 데이터를 받아와 시각화
+
 #-*- coding:utf-8 -*-
 
 import socket
