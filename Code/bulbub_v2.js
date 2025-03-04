@@ -42,7 +42,7 @@ var server = net.createServer(function(socket){                     // 콜백함
         
 	    if(command[0] == "bulbub"){  //불법주차 요청이 들어왔을 때
 
-            var insert = "INSERT INTO bulbub(ZONE, NUMBER) VALUES ('A','"+ command[1] + "')" ;
+            var insert = "INSERT INTO bulbub(ZONE, NUMBER, detected_time) VALUES ('A','"+ command[1] + "', now()) ON DUPLICATE KEY UPDATE detected_time = NOW();" ; //중복 데이터 방지
                 
             sql.query(insert,function(err,result,field){    //차량 번호와 구역을 DB에 저장
     
