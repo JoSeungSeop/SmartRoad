@@ -1,3 +1,5 @@
+//미세먼지를 공공 api에서 받아옴
+
 var convert = require('xml-js');    // xml 데이터를 json으로 파싱할 수 있는 모듈
 var request = require('request');   // 미세먼지 API에 요청을 보낼 때 사용하는 모듈
 var schedule = require('node-schedule');    // 일정시간마다 원하는 함수를 호출하기 위해 사용하는 모듈
