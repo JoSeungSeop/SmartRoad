@@ -1,3 +1,5 @@
+//다른 서버 파일들을 실행함
+
 var net = require('net');       // 소켓 서버를 위한 모듈
 var mysql = require("mysql");   // MariaDB와 연동을 위한 모듈
 var munzi = require("./FineDust.js"); //다른 서버 파일들을 import하는 모듈
