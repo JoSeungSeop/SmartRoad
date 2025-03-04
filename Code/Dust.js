@@ -1,4 +1,4 @@
-//미세먼지 요청을 받는 서버
+//미세먼지 요청을 받음
 
 var net = require('net');       // 소켓 서버를 위한 모듈
 var mysql = require("mysql");   // MariaDB와 연동을 위한 모듈
